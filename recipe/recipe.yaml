@@ -1,0 +1,68 @@
+schema_version: 1
+
+context:
+  name: torchx
+  version: "0.7.0"
+  python_min: "3.10"
+
+package:
+  name: ${{ name|lower }}
+  version: ${{ version }}
+
+source:
+  url: https://github.com/pytorch/torchx/archive/v${{ version }}.tar.gz
+  sha256: 6a28e2a84dc9955856653fc6ce669fa36e522db82698426ace0ea54b0a02f9b8
+
+build:
+  number: 2
+  noarch: python
+  script: ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  python:
+    entry_points:
+      - torchx = torchx.cli.main:main
+
+requirements:
+  host:
+    - pip
+    - python ${{ python_min }}.*
+    - setuptools
+  run:
+    - docker-py
+    - docstring_parser >=0.8.1
+    - filelock
+    - fsspec >=2023.10.0
+    - importlib-metadata
+    - pyre-extensions
+    - python >=${{ python_min }}
+    - pyyaml
+    - tabulate
+    - urllib3 >=1.21.1,<1.27
+
+tests:
+  - python:
+      imports:
+        - torchx
+      pip_check: true
+      python_version: ${{ python_min }}.*
+  - script:
+      - pip check
+      - torchx -h
+      - python run_test.py
+    files:
+      recipe:
+        - run_test.py
+    requirements:
+      run:
+        - pip
+        - python ${{ python_min }}.*
+
+about:
+  homepage: https://github.com/pytorch/torchx
+  repository: https://github.com/pytorch/torchx
+  summary: A universal job launcher for PyTorch applications
+  license: BSD-3-Clause
+  license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - jeongseok-meta
